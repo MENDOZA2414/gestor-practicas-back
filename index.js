@@ -3,8 +3,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
 const md5 = require('md5');
-const mysql = require('mysql2'); // Importa el módulo mysql2
-const pool = require('./db'); // Importa la conexión de pool desde db.js
+import {pool} from './db.js'
+
 const app = express();
 
 const PORT = process.env.PORT || 3001;
@@ -13,10 +13,20 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
-
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
+    console.log(`MYSQLHOST: ${process.env.MYSQLHOST}`);
+    console.log(`MYSQLUSER: ${process.env.MYSQLUSER}`);
+    console.log(`MYSQLPASSWORD: ${process.env.MYSQLPASSWORD}`);
+    console.log(`MYSQLDATABASE: ${process.env.MYSQLDATABASE}`);
+    console.log(`MYSQLPORT: ${process.env.MYSQLPORT}`);
 });
+
+// Ruta de prueba de conexión
+app.get('/testConnection', (req, res) => {
+    res.send('Connection successful');
+});
+
 
 // Configuración para imágenes (JPG, JPEG, PNG)
 const storage = multer.memoryStorage();
@@ -219,7 +229,9 @@ app.get('/asesorInterno/:id', async (req, res) => {
     const query = 'SELECT * FROM asesorInterno WHERE asesorInternoID = ?';
 
     try {
+        console.log('Ejecutando consulta para obtener asesor interno con ID:', asesorInternoID);
         const [results] = await pool.query(query, [asesorInternoID]);
+        console.log('Resultados de la consulta:', results);
         if (results.length > 0) {
             const asesor = results[0];
             if (asesor.fotoPerfil) {
@@ -233,9 +245,10 @@ app.get('/asesorInterno/:id', async (req, res) => {
         }
     } catch (err) {
         console.error('Error obteniendo asesor interno:', err);
-        res.status(500).json({ error: 'Error obteniendo asesor interno' });
+        res.status(500).send({ message: 'Error en el servidor: ' + err.message });
     }
 });
+
 
 // Ruta para obtener una entidad receptora por ID
 app.get('/entidadReceptora/:id', async (req, res) => {
@@ -313,9 +326,11 @@ app.get('/asesorExterno/:id', async (req, res) => {
             });
         }
     } catch (err) {
+        console.error('Error obteniendo asesor externo:', err);
         res.status(500).send({ message: 'Error en el servidor: ' + err.message });
     }
 });
+
 
 // Ruta para obtener todos los documentos de un alumno
 app.get('/documentoAlumnoSubidos/:alumnoID', async (req, res) => {
