@@ -3,8 +3,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
 const md5 = require('md5');
-import {pool} from './db.js'
-
+const mysql = require('mysql2'); // Importa el módulo mysql2
+const pool = require('./db'); // Importa la conexión de pool desde db.js
 const app = express();
 
 const PORT = process.env.PORT || 3001;
@@ -13,30 +13,33 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
+
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
-    console.log(`MYSQLHOST: ${process.env.MYSQLHOST}`);
-    console.log(`MYSQLUSER: ${process.env.MYSQLUSER}`);
-    console.log(`MYSQLPASSWORD: ${process.env.MYSQLPASSWORD}`);
-    console.log(`MYSQLDATABASE: ${process.env.MYSQLDATABASE}`);
-    console.log(`MYSQLPORT: ${process.env.MYSQLPORT}`);
 });
 
-// Ruta de prueba de conexión
+app.get('/', (req, res) => {
+    res.send('Servidor funcionando');
+});
+
+// Imprimir las variables de entorno
+console.log("MYSQLHOST:", process.env.MYSQLHOST);
+console.log("MYSQLUSER:", process.env.MYSQLUSER);
+console.log("MYSQLPASSWORD:", process.env.MYSQLPASSWORD);
+console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
+console.log("MYSQLPORT:", process.env.MYSQLPORT);
+
 app.get('/testConnection', async (req, res) => {
+    const query = 'SELECT COUNT(*) as count FROM asesorInterno';
+
     try {
-        const [results] = await pool.query('SELECT 1 + 1 AS solution');
-        res.status(200).send({ solution: results[0].solution });
+        const [results] = await pool.query(query);
+        res.status(200).send({ message: 'Consulta exitosa', count: results[0].count });
     } catch (err) {
-        console.error('Error probando la conexión:', err);
-        res.status(500).send({ 
-            error: 'Error probando la conexión', 
-            details: err.message 
-        });
+        console.error('Error en la consulta de prueba:', err);
+        res.status(500).send({ message: 'Error en el servidor ejecutando la consulta de prueba', error: err.message });
     }
 });
-
-
 
 // Configuración para imágenes (JPG, JPEG, PNG)
 const storage = multer.memoryStorage();
