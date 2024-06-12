@@ -7,16 +7,18 @@ const md5 = require('md5');
 const app = express();
 
 const PORT = process.env.PORT || 3001;
-const DB_HOST = process.env.DB_HOST || 'localhost';
-const DB_USER = process.env.DB_USER || 'root';
-const DB_PASSWORD = process.env.DB_PASSWORD || 'Jm241410';
-const DB_NAME = process.env.DB_NAME || 'sistemaPracticas';
+const MYSQLHOST = process.env.MYSQLHOST || 'localhost';
+const MYSQLUSER = process.env.MYSQLUSER || 'root';
+const MYSQLPASSWORD = process.env.MYSQLPASSWORD || 'Jm241410';
+const MYSQLDATABASE = process.env.MYSQLDATABASE || 'sistemaPracticas';
+const MYSQLPORT = process.env.MYSQLPORT || 3306;
 
 const dbConfig = {
-    host: DB_HOST,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    database: DB_NAME,
+    host: MYSQLHOST,
+    user: MYSQLUSER,
+    password: MYSQLPASSWORD,
+    database: MYSQLDATABASE,
+    port: MYSQLPORT,
     connectTimeout: 100000,
     acquireTimeout: 100000,
 };
