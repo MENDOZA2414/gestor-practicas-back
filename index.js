@@ -23,9 +23,19 @@ app.listen(PORT, () => {
 });
 
 // Ruta de prueba de conexión
-app.get('/testConnection', (req, res) => {
-    res.send('Connection successful');
+app.get('/testConnection', async (req, res) => {
+    try {
+        const [results] = await pool.query('SELECT 1 + 1 AS solution');
+        res.status(200).send({ solution: results[0].solution });
+    } catch (err) {
+        console.error('Error probando la conexión:', err);
+        res.status(500).send({ 
+            error: 'Error probando la conexión', 
+            details: err.message 
+        });
+    }
 });
+
 
 
 // Configuración para imágenes (JPG, JPEG, PNG)
