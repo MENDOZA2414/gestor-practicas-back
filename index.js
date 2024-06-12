@@ -1670,108 +1670,6 @@ app.post('/api/uploadFormato', pdfUpload.single('file'), (req, res) => {
     });
 });
 
-// ------------------------------ METODOS PUT ------------------------------------------
-app.put('/entidadReceptora/:id', upload.single('foto'), (req, res) => {
-    const entidadID = req.params.id;
-    const { nombreEntidad, nombreUsuario, direccion, categoria, correo, numCelular } = req.body;
-    const fotoPerfil = req.file ? req.file.buffer : null;
-
-    let query = 'UPDATE entidadReceptora SET ';
-    let fields = [];
-    let values = [];
-
-    if (nombreEntidad) fields.push('nombreEntidad = ?'), values.push(nombreEntidad);
-    if (nombreUsuario) fields.push('nombreUsuario = ?'), values.push(nombreUsuario);
-    if (direccion) fields.push('direccion = ?'), values.push(direccion);
-    if (categoria) fields.push('categoria = ?'), values.push(categoria);
-    if (correo) fields.push('correo = ?'), values.push(correo);
-    if (numCelular) fields.push('numCelular = ?'), values.push(numCelular);
-    if (fotoPerfil) fields.push('fotoPerfil = ?'), values.push(fotoPerfil);
-
-    if (fields.length === 0) {
-        return res.status(400).send({ message: 'No fields to update' });
-    }
-
-    query += fields.join(', ') + ' WHERE entidadID = ?';
-    values.push(entidadID);
-
-    connection.query(query, values, (err, result) => {
-        if (err) {
-            console.error('Error updating data:', err);
-            return res.status(500).send({ message: 'Error en el servidor' });
-        }
-        res.status(200).send({ message: 'Entidad actualizada con éxito' });
-    });
-});
-
-app.put('/alumno/:numControl', upload.single('foto'), (req, res) => {
-    const numControl = req.params.numControl;
-    const { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, carrera, semestre, turno, correo, numCelular } = req.body;
-    const fotoPerfil = req.file ? req.file.buffer : null;
-
-    let query = 'UPDATE alumno SET ';
-    let fields = [];
-    let values = [];
-
-    if (nombre) fields.push('nombre = ?'), values.push(nombre);
-    if (apellidoPaterno) fields.push('apellidoPaterno = ?'), values.push(apellidoPaterno);
-    if (apellidoMaterno) fields.push('apellidoMaterno = ?'), values.push(apellidoMaterno);
-    if (fechaNacimiento) fields.push('fechaNacimiento = ?'), values.push(fechaNacimiento);
-    if (carrera) fields.push('carrera = ?'), values.push(carrera);
-    if (semestre) fields.push('semestre = ?'), values.push(semestre);
-    if (turno) fields.push('turno = ?'), values.push(turno);
-    if (correo) fields.push('correo = ?'), values.push(correo);
-    if (numCelular) fields.push('numCelular = ?'), values.push(numCelular);
-    if (fotoPerfil) fields.push('fotoPerfil = ?'), values.push(fotoPerfil);
-
-    if (fields.length === 0) {
-        return res.status(400).send({ message: 'No fields to update' });
-    }
-
-    query += fields.join(', ') + ' WHERE numControl = ?';
-    values.push(numControl);
-
-    connection.query(query, values, (err, result) => {
-        if (err) {
-            console.error('Error updating data:', err);
-            return res.status(500).send({ message: 'Error en el servidor' });
-        }
-        res.status(200).send({ message: 'Alumno actualizado con éxito' });
-    });
-});
-
-app.put('/asesorInterno/:id', upload.single('foto'), (req, res) => {
-  const id = req.params.id;
-  const { nombre, apellidoPaterno, apellidoMaterno, correo, numCelular } = req.body;
-  const fotoPerfil = req.file ? req.file.buffer : null;
-
-  let query = 'UPDATE asesorInterno SET ';
-  let fields = [];
-  let values = [];
-
-  if (nombre) fields.push('nombre = ?'), values.push(nombre);
-  if (apellidoPaterno) fields.push('apellidoPaterno = ?'), values.push(apellidoPaterno);
-  if (apellidoMaterno) fields.push('apellidoMaterno = ?'), values.push(apellidoMaterno);
-  if (correo) fields.push('correo = ?'), values.push(correo);
-  if (numCelular) fields.push('numCelular = ?'), values.push(numCelular);
-  if (fotoPerfil) fields.push('fotoPerfil = ?'), values.push(fotoPerfil);
-
-  if (fields.length === 0) {
-    return res.status(400).send({ message: 'No fields to update' });
-  }
-
-  query += fields.join(', ') + ' WHERE asesorInternoID = ?';
-  values.push(id);
-
-  connection.query(query, values, (err, result) => {
-    if (err) {
-      console.error('Error updating data:', err);
-      return res.status(500).send({ message: 'Error en el servidor' });
-    }
-    res.status(200).send({ message: 'Asesor Interno actualizado con éxito' });
-  });
-});
-
 // ------------------------------ METODOS DELETE ------------------------------------------
 // Ruta para eliminar un documento de la tabla documentoAlumno actualizar el estatus
 app.delete('/documentoAlumno/:id', (req, res) => {
@@ -2056,4 +1954,105 @@ app.put('/vacantePractica/:id', (req, res) => {
       }
       res.status(200).send({ message: 'Vacante actualizada con éxito' });
     });
+});
+
+app.put('/entidadReceptora/:id', upload.single('foto'), (req, res) => {
+    const entidadID = req.params.id;
+    const { nombreEntidad, nombreUsuario, direccion, categoria, correo, numCelular } = req.body;
+    const fotoPerfil = req.file ? req.file.buffer : null;
+
+    let query = 'UPDATE entidadReceptora SET ';
+    let fields = [];
+    let values = [];
+
+    if (nombreEntidad) fields.push('nombreEntidad = ?'), values.push(nombreEntidad);
+    if (nombreUsuario) fields.push('nombreUsuario = ?'), values.push(nombreUsuario);
+    if (direccion) fields.push('direccion = ?'), values.push(direccion);
+    if (categoria) fields.push('categoria = ?'), values.push(categoria);
+    if (correo) fields.push('correo = ?'), values.push(correo);
+    if (numCelular) fields.push('numCelular = ?'), values.push(numCelular);
+    if (fotoPerfil) fields.push('fotoPerfil = ?'), values.push(fotoPerfil);
+
+    if (fields.length === 0) {
+        return res.status(400).send({ message: 'No fields to update' });
+    }
+
+    query += fields.join(', ') + ' WHERE entidadID = ?';
+    values.push(entidadID);
+
+    connection.query(query, values, (err, result) => {
+        if (err) {
+            console.error('Error updating data:', err);
+            return res.status(500).send({ message: 'Error en el servidor' });
+        }
+        res.status(200).send({ message: 'Entidad actualizada con éxito' });
+    });
+});
+
+app.put('/alumno/:numControl', upload.single('foto'), (req, res) => {
+    const numControl = req.params.numControl;
+    const { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, carrera, semestre, turno, correo, numCelular } = req.body;
+    const fotoPerfil = req.file ? req.file.buffer : null;
+
+    let query = 'UPDATE alumno SET ';
+    let fields = [];
+    let values = [];
+
+    if (nombre) fields.push('nombre = ?'), values.push(nombre);
+    if (apellidoPaterno) fields.push('apellidoPaterno = ?'), values.push(apellidoPaterno);
+    if (apellidoMaterno) fields.push('apellidoMaterno = ?'), values.push(apellidoMaterno);
+    if (fechaNacimiento) fields.push('fechaNacimiento = ?'), values.push(fechaNacimiento);
+    if (carrera) fields.push('carrera = ?'), values.push(carrera);
+    if (semestre) fields.push('semestre = ?'), values.push(semestre);
+    if (turno) fields.push('turno = ?'), values.push(turno);
+    if (correo) fields.push('correo = ?'), values.push(correo);
+    if (numCelular) fields.push('numCelular = ?'), values.push(numCelular);
+    if (fotoPerfil) fields.push('fotoPerfil = ?'), values.push(fotoPerfil);
+
+    if (fields.length === 0) {
+        return res.status(400).send({ message: 'No fields to update' });
+    }
+
+    query += fields.join(', ') + ' WHERE numControl = ?';
+    values.push(numControl);
+
+    connection.query(query, values, (err, result) => {
+        if (err) {
+            console.error('Error updating data:', err);
+            return res.status(500).send({ message: 'Error en el servidor' });
+        }
+        res.status(200).send({ message: 'Alumno actualizado con éxito' });
+    });
+});
+
+app.put('/asesorInterno/:id', upload.single('foto'), (req, res) => {
+  const id = req.params.id;
+  const { nombre, apellidoPaterno, apellidoMaterno, correo, numCelular } = req.body;
+  const fotoPerfil = req.file ? req.file.buffer : null;
+
+  let query = 'UPDATE asesorInterno SET ';
+  let fields = [];
+  let values = [];
+
+  if (nombre) fields.push('nombre = ?'), values.push(nombre);
+  if (apellidoPaterno) fields.push('apellidoPaterno = ?'), values.push(apellidoPaterno);
+  if (apellidoMaterno) fields.push('apellidoMaterno = ?'), values.push(apellidoMaterno);
+  if (correo) fields.push('correo = ?'), values.push(correo);
+  if (numCelular) fields.push('numCelular = ?'), values.push(numCelular);
+  if (fotoPerfil) fields.push('fotoPerfil = ?'), values.push(fotoPerfil);
+
+  if (fields.length === 0) {
+    return res.status(400).send({ message: 'No fields to update' });
+  }
+
+  query += fields.join(', ') + ' WHERE asesorInternoID = ?';
+  values.push(id);
+
+  connection.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Error updating data:', err);
+      return res.status(500).send({ message: 'Error en el servidor' });
+    }
+    res.status(200).send({ message: 'Asesor Interno actualizado con éxito' });
+  });
 });
