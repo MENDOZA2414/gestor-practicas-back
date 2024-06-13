@@ -1305,7 +1305,7 @@ app.post('/rejectPostulacion', async (req, res) => {
 // Ruta para aceptar una postulación
 app.post('/acceptPostulacion', async (req, res) => {
     const { postulacionID } = req.body;
-
+  
     const queryPostulacion = `
         SELECT 
             p.alumnoID, p.vacanteID, p.nombreAlumno, p.correoAlumno,
@@ -1318,70 +1318,75 @@ app.post('/acceptPostulacion', async (req, res) => {
         WHERE 
             p.postulacionID = ?
     `;
-
-    const connection = await pool.getConnection();
+  
+    let connection;
     try {
-        await connection.beginTransaction();
-
-        console.log('Buscando la postulación con ID:', postulacionID);
-        const [result] = await connection.query(queryPostulacion, [postulacionID]);
-        
-        if (result.length === 0) {
-            console.log('No se encontró la postulación');
-            await connection.rollback();
-            return res.status(404).send({ message: 'No se encontró la postulación' });
-        }
-
-        const postulacion = result[0];
-        console.log('Postulación encontrada:', postulacion);
-        const fechaInicio = postulacion.fechaInicio instanceof Date ? postulacion.fechaInicio.toISOString().split('T')[0] : postulacion.fechaInicio;
-        const fechaFinal = postulacion.fechaFinal instanceof Date ? postulacion.fechaFinal.toISOString().split('T')[0] : postulacion.fechaFinal;
-
-        const queryInsertPractica = `
-            INSERT INTO practicasProfesionales 
-            (alumnoID, entidadID, asesorExternoID, fechaInicio, fechaFin, estado, tituloVacante, fechaCreacion)
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
-        `;
-
-        const values = [
-            postulacion.alumnoID, 
-            postulacion.entidadID, 
-            postulacion.asesorExternoID, 
-            fechaInicio, 
-            fechaFinal, 
-            'Iniciada',
-            postulacion.tituloVacante
-        ];
-
-        console.log('Insertando práctica profesional con valores:', values);
-        await connection.query(queryInsertPractica, values);
-
-        // Eliminar todas las postulaciones del alumno en todas las vacantes y entidades
-        const queryDeletePostulaciones = `
-            DELETE FROM postulacionAlumno WHERE alumnoID = ?
-        `;
-        console.log('Eliminando todas las postulaciones para el alumnoID:', postulacion.alumnoID);
-        await connection.query(queryDeletePostulaciones, [postulacion.alumnoID]);
-
-        // Eliminar la vacante actual
-        const queryDeleteVacante = `
-            DELETE FROM vacantePractica WHERE vacantePracticaID = ?
-        `;
-        console.log('Eliminando vacante con vacantePracticaID:', postulacion.vacanteID);
-        await connection.query(queryDeleteVacante, [postulacion.vacanteID]);
-
-        await connection.commit();
-        console.log('Transacción completada con éxito');
-        res.status(201).send({ message: 'Práctica profesional registrada, postulaciones eliminadas y vacante eliminada con éxito' });
-
-    } catch (error) {
+      connection = await pool.getConnection();
+      await connection.beginTransaction();
+  
+      console.log('Buscando la postulación con ID:', postulacionID);
+      const [result] = await connection.query(queryPostulacion, [postulacionID]);
+  
+      if (result.length === 0) {
+        console.log('No se encontró la postulación');
         await connection.rollback();
-        console.error('Error en el servidor al registrar la práctica profesional:', error);
-        res.status(500).send({ message: 'Error en el servidor al registrar la práctica profesional', error: error.message });
+        return res.status(404).send({ message: 'No se encontró la postulación' });
+      }
+  
+      const postulacion = result[0];
+      console.log('Postulación encontrada:', postulacion);
+      const fechaInicio = postulacion.fechaInicio instanceof Date ? postulacion.fechaInicio.toISOString().split('T')[0] : postulacion.fechaInicio;
+      const fechaFinal = postulacion.fechaFinal instanceof Date ? postulacion.fechaFinal.toISOString().split('T')[0] : postulacion.fechaFinal;
+  
+      const queryInsertPractica = `
+          INSERT INTO practicasProfesionales 
+          (alumnoID, entidadID, asesorExternoID, fechaInicio, fechaFin, estado, tituloVacante, fechaCreacion)
+          VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+      `;
+  
+      const values = [
+        postulacion.alumnoID,
+        postulacion.entidadID,
+        postulacion.asesorExternoID,
+        fechaInicio,
+        fechaFinal,
+        'Iniciada',
+        postulacion.tituloVacante
+      ];
+  
+      console.log('Insertando práctica profesional con valores:', values);
+      await connection.query(queryInsertPractica, values);
+  
+      // Eliminar todas las postulaciones del alumno en todas las vacantes y entidades
+      const queryDeletePostulaciones = `
+          DELETE FROM postulacionAlumno WHERE alumnoID = ?
+      `;
+      console.log('Eliminando todas las postulaciones para el alumnoID:', postulacion.alumnoID);
+      await connection.query(queryDeletePostulaciones, [postulacion.alumnoID]);
+  
+      // Eliminar la vacante actual
+      const queryDeleteVacante = `
+          DELETE FROM vacantePractica WHERE vacantePracticaID = ?
+      `;
+      console.log('Eliminando vacante con vacantePracticaID:', postulacion.vacanteID);
+      await connection.query(queryDeleteVacante, [postulacion.vacanteID]);
+  
+      await connection.commit();
+      console.log('Transacción completada con éxito');
+      res.status(201).send({ message: 'Práctica profesional registrada, postulaciones eliminadas y vacante eliminada con éxito' });
+  
+    } catch (error) {
+      if (connection) {
+        await connection.rollback();
+      }
+      console.error('Error en el servidor al registrar la práctica profesional:', error.message, 'Detalles:', error);
+      res.status(500).send({ message: 'Error en el servidor al registrar la práctica profesional', error: error.message });
     } finally {
+      if (connection) {
         connection.release();
+      }
     }
-});
+  })
 
 
 
