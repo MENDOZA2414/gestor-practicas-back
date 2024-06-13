@@ -1174,7 +1174,7 @@ app.post('/register/asesorExterno', upload.single('fotoPerfil'), async (req, res
 app.post('/login/alumno', async (req, res) => {
     const { email, password } = req.body;
     console.log('Received login request:', email, password); // Log para verificar los datos
-    const query = `SELECT * FROM alumno WHERE correo = ? AND contraseña = md5(?)`;
+    const query = `SELECT * FROM alumno WHERE correo = ? AND password = md5(?)`;
 
     try {
         console.log('Executing query...');
