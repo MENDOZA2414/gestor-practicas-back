@@ -1376,7 +1376,6 @@ app.post('/acceptPostulacion', async (req, res) => {
 });
 
 
-
 // Ruta para subir un documento de alumno
 app.post('/uploadDocumentoAlumno', pdfUpload.single('file'), async (req, res) => {
     const { alumnoID, nombreArchivo, usuarioTipo } = req.body;
