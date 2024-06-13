@@ -1352,16 +1352,16 @@ app.post('/acceptPostulacion', async (req, res) => {
 
         await connection.query(queryInsertPractica, values);
 
-        // Eliminar todas las postulaciones del alumno en todas las vacantes y entidades
         const queryDeletePostulaciones = `
             DELETE FROM postulacionAlumno WHERE alumnoID = ?
         `;
-        await connection.query(queryDeletePostulaciones, [postulacion.alumnoID]);
 
-        // Eliminar la vacante actual
+        await connection.query(queryDeletePostulaciones, [postulacion.vacanteID]);
+
         const queryDeleteVacante = `
             DELETE FROM vacantePractica WHERE vacantePracticaID = ?
         `;
+
         await connection.query(queryDeleteVacante, [postulacion.vacanteID]);
 
         await connection.commit();
