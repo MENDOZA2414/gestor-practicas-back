@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2');
 
 const MYSQLHOST = process.env.MYSQLHOST || 'localhost';
 const MYSQLUSER = process.env.MYSQLUSER || 'root';
