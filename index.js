@@ -1630,19 +1630,26 @@ app.delete('/alumno/:numControl', async (req, res) => {
     const deleteQuery = 'DELETE FROM alumno WHERE numControl = ?';
 
     try {
-        const [result] = await pool.query(checkStatusQuery, [numControl]);
+        const connection = await pool.getConnection();
 
-        if (result.length > 0 && result[0].estatus === 'Aceptado') {
-            await pool.query(deleteQuery, [numControl]);
-            res.status(200).send({ message: 'Alumno eliminado con éxito' });
-        } else {
-            res.status(403).send({ message: 'Solo se pueden eliminar elementos aceptados' });
+        try {
+            const [result] = await connection.query(checkStatusQuery, [numControl]);
+
+            if (result.length > 0 && result[0].estatus === 'Aceptado') {
+                await connection.query(deleteQuery, [numControl]);
+                res.status(200).send({ message: 'Alumno eliminado con éxito' });
+            } else {
+                res.status(403).send({ message: 'Solo se pueden eliminar elementos aceptados' });
+            }
+        } finally {
+            connection.release();
         }
     } catch (err) {
         console.error('Error en el servidor:', err);
-        return res.status(500).send({ message: 'Error en el servidor: ' + err.message });
+        res.status(500).send({ message: 'Error en el servidor: ' + err.message });
     }
 });
+
 
 // Eliminar vacante
 app.delete('/vacantePractica/:vacantePracticaID', async (req, res) => {
