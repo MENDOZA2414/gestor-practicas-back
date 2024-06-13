@@ -1173,7 +1173,7 @@ app.post('/register/asesorExterno', upload.single('fotoPerfil'), async (req, res
 // Ruta para el inicio de sesión de un alumno
 app.post('/login/alumno', async (req, res) => {
     const { email, password } = req.body;
-
+    console.log('Received login request:', email, password); // Agrega este log para verificar los datos
     const query = `SELECT * FROM alumno WHERE correo = ? AND contraseña = md5(?)`;
 
     try {
