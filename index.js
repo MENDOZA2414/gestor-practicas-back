@@ -1319,18 +1319,36 @@ app.post('/acceptPostulacion', async (req, res) => {
             p.postulacionID = ?
     `;
 
+    const queryCheckPractica = `
+        SELECT * FROM practicasProfesionales WHERE alumnoID = ?
+    `;
+
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
 
-        const [result] = await connection.query(queryPostulacion, [postulacionID]);
+        const [resultPostulacion] = await connection.query(queryPostulacion, [postulacionID]);
         
-        if (result.length === 0) {
+        if (resultPostulacion.length === 0) {
             await connection.rollback();
             return res.status(404).send({ message: 'No se encontró la postulación' });
         }
 
-        const postulacion = result[0];
+        const postulacion = resultPostulacion[0];
+
+        // Verificar si el alumno ya tiene una práctica profesional
+        const [resultPractica] = await connection.query(queryCheckPractica, [postulacion.alumnoID]);
+
+        if (resultPractica.length > 0) {
+            const queryDeletePostulaciones = `
+                DELETE FROM postulacionAlumno WHERE alumnoID = ?
+            `;
+            await connection.query(queryDeletePostulaciones, [postulacion.alumnoID]);
+
+            await connection.commit();
+            return res.status(400).send({ message: 'El alumno ya tiene una práctica profesional registrada. Todas sus postulaciones han sido eliminadas.' });
+        }
+
         const fechaInicio = postulacion.fechaInicio instanceof Date ? postulacion.fechaInicio.toISOString().split('T')[0] : postulacion.fechaInicio;
         const fechaFinal = postulacion.fechaFinal instanceof Date ? postulacion.fechaFinal.toISOString().split('T')[0] : postulacion.fechaFinal;
 
@@ -1353,10 +1371,10 @@ app.post('/acceptPostulacion', async (req, res) => {
         await connection.query(queryInsertPractica, values);
 
         const queryDeletePostulaciones = `
-            DELETE FROM postulacionAlumno WHERE vacanteID = ?
+            DELETE FROM postulacionAlumno WHERE alumnoID = ?
         `;
 
-        await connection.query(queryDeletePostulaciones, [postulacion.vacanteID]);
+        await connection.query(queryDeletePostulaciones, [postulacion.alumnoID]);
 
         const queryDeleteVacante = `
             DELETE FROM vacantePractica WHERE vacantePracticaID = ?
