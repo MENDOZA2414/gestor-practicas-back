@@ -233,7 +233,7 @@ app.get('/postulaciones/:alumnoID', async (req, res) => {
 // Ruta para obtener un asesor interno por ID
 app.get('/asesorInterno/:id', async (req, res) => {
     const asesorInternoID = req.params.id;
-    const query = 'SELECT * FROM asesorinterno WHERE asesorInternoID = ?';
+    const query = 'SELECT * FROM asesorInterno WHERE asesorInternoID = ?';
 
     try {
         console.log('Ejecutando consulta para obtener asesor interno con ID:', asesorInternoID);
