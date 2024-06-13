@@ -1319,10 +1319,14 @@ app.post('/acceptPostulacion', async (req, res) => {
             p.postulacionID = ?
     `;
 
+    const connection = await pool.getConnection();
     try {
-        const [result] = await pool.query(queryPostulacion, [postulacionID]);
+        await connection.beginTransaction();
+
+        const [result] = await connection.query(queryPostulacion, [postulacionID]);
         
         if (result.length === 0) {
+            await connection.rollback();
             return res.status(404).send({ message: 'No se encontró la postulación' });
         }
 
@@ -1346,26 +1350,31 @@ app.post('/acceptPostulacion', async (req, res) => {
             postulacion.tituloVacante
         ];
 
-        await pool.query(queryInsertPractica, values);
+        await connection.query(queryInsertPractica, values);
 
-        const queryDeletePostulacion = `
-            DELETE FROM postulacionAlumno WHERE alumnoID = ?
+        const queryDeletePostulaciones = `
+            DELETE FROM postulacionAlumno WHERE vacanteID = ?
         `;
 
-        await pool.query(queryDeletePostulacion, [postulacion.alumnoID]);
+        await connection.query(queryDeletePostulaciones, [postulacion.vacanteID]);
 
         const queryDeleteVacante = `
             DELETE FROM vacantePractica WHERE vacantePracticaID = ?
         `;
 
-        await pool.query(queryDeleteVacante, [postulacion.vacanteID]);
+        await connection.query(queryDeleteVacante, [postulacion.vacanteID]);
 
+        await connection.commit();
         res.status(201).send({ message: 'Práctica profesional registrada, postulaciones eliminadas y vacante eliminada con éxito' });
 
     } catch (error) {
+        await connection.rollback();
         res.status(500).send({ message: 'Error en el servidor al registrar la práctica profesional', error: error.message });
+    } finally {
+        connection.release();
     }
 });
+
 
 // Ruta para subir un documento de alumno
 app.post('/uploadDocumentoAlumno', pdfUpload.single('file'), async (req, res) => {
