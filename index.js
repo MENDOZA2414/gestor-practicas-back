@@ -1323,14 +1323,17 @@ app.post('/acceptPostulacion', async (req, res) => {
     try {
         await connection.beginTransaction();
 
+        console.log('Buscando la postulación con ID:', postulacionID);
         const [result] = await connection.query(queryPostulacion, [postulacionID]);
         
         if (result.length === 0) {
+            console.log('No se encontró la postulación');
             await connection.rollback();
             return res.status(404).send({ message: 'No se encontró la postulación' });
         }
 
         const postulacion = result[0];
+        console.log('Postulación encontrada:', postulacion);
         const fechaInicio = postulacion.fechaInicio instanceof Date ? postulacion.fechaInicio.toISOString().split('T')[0] : postulacion.fechaInicio;
         const fechaFinal = postulacion.fechaFinal instanceof Date ? postulacion.fechaFinal.toISOString().split('T')[0] : postulacion.fechaFinal;
 
@@ -1350,30 +1353,37 @@ app.post('/acceptPostulacion', async (req, res) => {
             postulacion.tituloVacante
         ];
 
+        console.log('Insertando práctica profesional con valores:', values);
         await connection.query(queryInsertPractica, values);
 
         // Eliminar todas las postulaciones del alumno en todas las vacantes y entidades
         const queryDeletePostulaciones = `
             DELETE FROM postulacionAlumno WHERE alumnoID = ?
         `;
+        console.log('Eliminando todas las postulaciones para el alumnoID:', postulacion.alumnoID);
         await connection.query(queryDeletePostulaciones, [postulacion.alumnoID]);
 
         // Eliminar la vacante actual
         const queryDeleteVacante = `
             DELETE FROM vacantePractica WHERE vacantePracticaID = ?
         `;
+        console.log('Eliminando vacante con vacantePracticaID:', postulacion.vacanteID);
         await connection.query(queryDeleteVacante, [postulacion.vacanteID]);
 
         await connection.commit();
+        console.log('Transacción completada con éxito');
         res.status(201).send({ message: 'Práctica profesional registrada, postulaciones eliminadas y vacante eliminada con éxito' });
 
     } catch (error) {
         await connection.rollback();
+        console.error('Error en el servidor al registrar la práctica profesional:', error);
         res.status(500).send({ message: 'Error en el servidor al registrar la práctica profesional', error: error.message });
     } finally {
         connection.release();
     }
 });
+
+
 
 
 // Ruta para subir un documento de alumno
