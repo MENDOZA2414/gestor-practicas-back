@@ -1627,22 +1627,29 @@ app.delete('/documentoAlumnoSubido/:id', async (req, res) => {
 app.delete('/alumno/:numControl', async (req, res) => {
     const numControl = req.params.numControl;
     const checkStatusQuery = 'SELECT estatus FROM alumno WHERE numControl = ?';
+    const deleteDocumentsSubidosQuery = 'DELETE FROM documentosAlumnoSubido WHERE alumnoID = ?';
     const deleteDocumentsQuery = 'DELETE FROM documentoAlumno WHERE alumnoID = ?';
     const deleteAlumnoQuery = 'DELETE FROM alumno WHERE numControl = ?';
 
     try {
         const connection = await pool.getConnection();
-
+        
         try {
             const [result] = await connection.query(checkStatusQuery, [numControl]);
 
             if (result.length > 0 && result[0].estatus === 'Aceptado') {
+                await connection.beginTransaction();
+                await connection.query(deleteDocumentsSubidosQuery, [numControl]);
                 await connection.query(deleteDocumentsQuery, [numControl]);
                 await connection.query(deleteAlumnoQuery, [numControl]);
+                await connection.commit();
                 res.status(200).send({ message: 'Alumno y documentos eliminados con éxito' });
             } else {
                 res.status(403).send({ message: 'Solo se pueden eliminar elementos aceptados' });
             }
+        } catch (error) {
+            await connection.rollback();
+            throw error;
         } finally {
             connection.release();
         }
@@ -1651,6 +1658,7 @@ app.delete('/alumno/:numControl', async (req, res) => {
         res.status(500).send({ message: 'Error en el servidor: ' + err.message });
     }
 });
+
 
 
 
