@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
 const md5 = require('md5');
-const mysql = require('mysql2'); 
+const mysql = require('mysql2/promise'); 
 const pool = require('./db'); 
 const app = express();
 
