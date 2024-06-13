@@ -1087,7 +1087,7 @@ app.post('/register/alumno', upload.single('foto'), async (req, res) => {
     }
 
     const query = `
-        INSERT INTO alumno (numControl, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, carrera, semestre, turno, correo, password, numCelular, fotoPerfil, asesorInternoID)
+        INSERT INTO alumno (numControl, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, carrera, semestre, turno, correo, contraseña, numCelular, fotoPerfil, asesorInternoID)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, md5(?), ?, ?, ?)
     `;
 
@@ -1173,31 +1173,24 @@ app.post('/register/asesorExterno', upload.single('fotoPerfil'), async (req, res
 // Ruta para el inicio de sesión de un alumno
 app.post('/login/alumno', async (req, res) => {
     const { email, password } = req.body;
-    console.log('Received login request:', email, password); // Log para verificar los datos
-    const query = `SELECT * FROM alumno WHERE correo = ? AND password = md5(?)`;
+
+    const query = `SELECT * FROM alumno WHERE correo = ? AND contraseña = md5(?)`;
 
     try {
-        console.log('Executing query...');
         const [result] = await pool.query(query, [email, password]);
-        console.log('Query result:', result); // Log del resultado de la consulta
-
         if (result.length > 0) {
             const alumno = result[0];
             if (alumno.fotoPerfil) {
                 alumno.fotoPerfil = alumno.fotoPerfil.toString('base64');
             }
-            console.log('Login successful:', alumno); // Log para login exitoso
             return res.status(200).send(alumno);
         } else {
-            console.log('Invalid login credentials');
             return res.status(401).send({ status: 401, message: 'Correo o contraseña incorrectos' });
         }
     } catch (err) {
-        console.error('Server error:', err); // Log para errores en el servidor
-        return res.status(500).send({ message: 'Error en el servidor', error: err.message });
+        return res.status(500).send({ message: 'Error en el servidor' });
     }
 });
-
 
 // Ruta para el inicio de sesión de una entidad receptora
 app.post('/login/entidad', async (req, res) => {
@@ -1867,4 +1860,3 @@ app.put('/asesorInterno/:id', upload.single('foto'), async (req, res) => {
         res.status(500).send({ message: 'Error en el servidor' });
     }
 });
-
