@@ -9,12 +9,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3001;
 
-const corsOptions = {
-    origin: 'https://gestor-practicas-front-production.up.railway.app',
-    optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
@@ -1865,5 +1860,4 @@ app.put('/asesorInterno/:id', upload.single('foto'), async (req, res) => {
         res.status(500).send({ message: 'Error en el servidor' });
     }
 });
-
 
