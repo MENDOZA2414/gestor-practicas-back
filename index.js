@@ -1087,7 +1087,7 @@ app.post('/register/alumno', upload.single('foto'), async (req, res) => {
     }
 
     const query = `
-        INSERT INTO alumno (numControl, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, carrera, semestre, turno, correo, contraseña, numCelular, fotoPerfil, asesorInternoID)
+        INSERT INTO alumno (numControl, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, carrera, semestre, turno, correo, password, numCelular, fotoPerfil, asesorInternoID)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, md5(?), ?, ?, ?)
     `;
 
