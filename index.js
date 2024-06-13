@@ -501,17 +501,17 @@ app.get('/alumnos/all', async (req, res) => {
 });
 
 // Ruta para contar los documentos aceptados de un alumno
-app.get('/countAcceptedDocuments/:numControl', async (req, res) => {
-    const { numControl } = req.params;
+app.get('/countAcceptedDocuments/:alumnoID', async (req, res) => {
+    const { alumnoID } = req.params;
 
     const queryCountDocuments = `
         SELECT COUNT(*) AS acceptedCount
         FROM documentoAlumno
-        WHERE numControl = ? AND estado = 'aceptado'
+        WHERE alumnoID = ? AND estado = 'aceptado'
     `;
 
     try {
-        const [result] = await pool.query(queryCountDocuments, [numControl]);
+        const [result] = await pool.query(queryCountDocuments, [alumnoID]);
         res.status(200).json(result[0]);
     } catch (error) {
         res.status(500).json({ message: 'Error al contar los documentos aceptados', error: error.message });
