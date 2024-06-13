@@ -411,6 +411,28 @@ app.get('/documentoAlumnoAprobado/:alumnoID', async (req, res) => {
     }
 });
 
+// Obtener un documento de un alumno
+app.get('/documentoAlumno/:id', async (req, res) => {
+    const documentoID = req.params.id;
+    const query = 'SELECT archivo, nombreArchivo FROM documentoAlumno WHERE documentoID = ?';
+
+    try {
+        const [result] = await pool.query(query, [documentoID]);
+
+        if (result.length > 0) {
+            const documento = result[0];
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `inline; filename="${documento.nombreArchivo}"`);
+            res.send(Buffer.from(documento.archivo, 'binary'));
+        } else {
+            res.status(404).send({ message: 'Documento no encontrado' });
+        }
+    } catch (err) {
+        console.error('Error en el servidor:', err);
+        res.status(500).send({ message: 'Error en el servidor: ' + err.message });
+    }
+});
+
 // Obtener todas las entidades
 app.get('/entidades/all', async (req, res) => {
     const query = 'SELECT entidadID, nombreEntidad AS nombre, fotoPerfil AS logoEmpresa FROM entidadReceptora ORDER BY nombreEntidad';
