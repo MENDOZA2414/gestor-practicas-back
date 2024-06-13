@@ -184,9 +184,9 @@ app.get('/aplicaciones/:vacanteID', async (req, res) => {
 
 
 // Ruta para obtener una carta de presentación por ID de postulación
-app.get('/postulacionalumno/:id', async (req, res) => {
+app.get('/postulacionAlumno/:id', async (req, res) => {
     const documentoID = req.params.id;
-    const query = 'SELECT cartaPresentacion FROM postulacionalumno WHERE postulacionID = ?'; // Cambiado 'id' por 'postulacionID'
+    const query = 'SELECT cartaPresentacion FROM postulacionAlumno WHERE postulacionID = ?'; // Cambiado 'id' por 'postulacionID'
 
     try {
         const [results] = await pool.query(query, [documentoID]);
@@ -1286,7 +1286,7 @@ app.post('/rejectPostulacion', async (req, res) => {
     const { postulacionID } = req.body;
 
     const queryDeletePostulacion = `
-        DELETE FROM postulacionalumno
+        DELETE FROM postulacionAlumno
         WHERE postulacionID = ?
     `;
 
@@ -1312,7 +1312,7 @@ app.post('/acceptPostulacion', async (req, res) => {
             v.entidadID, v.asesorExternoID, v.titulo AS tituloVacante,
             v.fechaInicio, v.fechaFinal
         FROM 
-            postulacionalumno p
+            postulacionAlumno p
         JOIN 
             vacantePractica v ON p.vacanteID = v.vacantePracticaID
         WHERE 
@@ -1349,7 +1349,7 @@ app.post('/acceptPostulacion', async (req, res) => {
         await pool.query(queryInsertPractica, values);
 
         const queryDeletePostulacion = `
-            DELETE FROM postulacionalumno WHERE alumnoID = ?
+            DELETE FROM postulacionAlumno WHERE alumnoID = ?
         `;
 
         await pool.query(queryDeletePostulacion, [postulacion.alumnoID]);
@@ -1621,7 +1621,7 @@ app.delete('/vacantePractica/:id', async (req, res) => {
 
     try {
         // Primero, elimina todas las postulaciones asociadas a esta vacante
-        const deletePostulacionesQuery = 'DELETE FROM postulacionalumno WHERE vacanteID = ?';
+        const deletePostulacionesQuery = 'DELETE FROM postulacionAlumno WHERE vacanteID = ?';
         await pool.query(deletePostulacionesQuery, [vacanteID]);
 
         // Luego, elimina la vacante
@@ -1640,7 +1640,7 @@ app.delete('/postulacion/:id', async (req, res) => {
     const postulacionID = req.params.id;
 
     try {
-        const deletePostulacionQuery = 'DELETE FROM postulacionalumno WHERE postulacionID = ?';
+        const deletePostulacionQuery = 'DELETE FROM postulacionAlumno WHERE postulacionID = ?';
         await pool.query(deletePostulacionQuery, [postulacionID]);
 
         res.status(200).send({ message: 'Postulación eliminada con éxito' });
