@@ -507,7 +507,7 @@ app.get('/countAcceptedDocuments/:alumnoID', async (req, res) => {
     const queryCountDocuments = `
         SELECT COUNT(*) AS acceptedCount
         FROM documentoAlumno
-        WHERE alumnoID = ? AND estado = 'aceptado'
+        WHERE alumnoID = ? AND estatus = 'aceptado'
     `;
 
     try {
