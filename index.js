@@ -1623,11 +1623,12 @@ app.delete('/documentoAlumnoSubido/:id', async (req, res) => {
     }
 });
 
-// Eliminar alumno
+// Ruta para eliminar alumno
 app.delete('/alumno/:numControl', async (req, res) => {
     const numControl = req.params.numControl;
     const checkStatusQuery = 'SELECT estatus FROM alumno WHERE numControl = ?';
-    const deleteQuery = 'DELETE FROM alumno WHERE numControl = ?';
+    const deleteDocumentsQuery = 'DELETE FROM documentoAlumno WHERE alumnoID = ?';
+    const deleteAlumnoQuery = 'DELETE FROM alumno WHERE numControl = ?';
 
     try {
         const connection = await pool.getConnection();
@@ -1636,8 +1637,9 @@ app.delete('/alumno/:numControl', async (req, res) => {
             const [result] = await connection.query(checkStatusQuery, [numControl]);
 
             if (result.length > 0 && result[0].estatus === 'Aceptado') {
-                await connection.query(deleteQuery, [numControl]);
-                res.status(200).send({ message: 'Alumno eliminado con éxito' });
+                await connection.query(deleteDocumentsQuery, [numControl]);
+                await connection.query(deleteAlumnoQuery, [numControl]);
+                res.status(200).send({ message: 'Alumno y documentos eliminados con éxito' });
             } else {
                 res.status(403).send({ message: 'Solo se pueden eliminar elementos aceptados' });
             }
@@ -1649,6 +1651,7 @@ app.delete('/alumno/:numControl', async (req, res) => {
         res.status(500).send({ message: 'Error en el servidor: ' + err.message });
     }
 });
+
 
 
 // Eliminar vacante
