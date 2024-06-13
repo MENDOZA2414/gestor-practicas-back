@@ -178,7 +178,7 @@ app.get('/aplicaciones/:vacanteID', async (req, res) => {
         }
     } catch (err) {
         console.error('Error en la consulta:', err);
-        res.status(500).send({ message: 'Error en el servidor', error: err });
+        res.status(500).send({ message: 'ErroracceptPostulacion en el servidor', error: err });
     }
 });
 
@@ -719,7 +719,7 @@ app.get('/practicas/:entidadID', async (req, res) => {
             pp.fechaFin,
             pp.estado
         FROM
-            practicasprofesionales pp
+            practicasProfesionales pp
         JOIN alumno a ON pp.alumnoID = a.numControl
         JOIN asesorExterno ae ON pp.asesorExternoID = ae.asesorExternoID
         WHERE
@@ -756,7 +756,7 @@ app.get('/practica/alumno/:alumnoID', async (req, res) => {
             pp.estado,
             pp.tituloVacante
         FROM
-            practicasprofesionales pp
+            practicasProfesionales pp
         JOIN alumno a ON pp.alumnoID = a.numControl
         JOIN asesorExterno ae ON pp.asesorExternoID = ae.asesorExternoID
         JOIN entidadReceptora er ON pp.entidadID = er.entidadID
@@ -1331,7 +1331,7 @@ app.post('/acceptPostulacion', async (req, res) => {
         const fechaFinal = postulacion.fechaFinal instanceof Date ? postulacion.fechaFinal.toISOString().split('T')[0] : postulacion.fechaFinal;
 
         const queryInsertPractica = `
-            INSERT INTO practicasprofesionales 
+            INSERT INTO practicasProfesionales 
             (alumnoID, entidadID, asesorExternoID, fechaInicio, fechaFin, estado, tituloVacante, fechaCreacion)
             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
         `;
