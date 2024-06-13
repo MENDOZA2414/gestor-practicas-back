@@ -161,7 +161,7 @@ app.get('/aplicaciones/:vacanteID', async (req, res) => {
     const vacanteID = req.params.vacanteID;
     const query = `
         SELECT P.*, V.titulo AS vacanteTitulo
-        FROM postulacionalumno P
+        FROM postulacionAlumno P
         INNER JOIN vacantePractica V ON P.vacanteID = V.vacantePracticaID
         WHERE P.vacanteID = ?
     `;
@@ -171,7 +171,7 @@ app.get('/aplicaciones/:vacanteID', async (req, res) => {
         if (results.length > 0) {
             res.status(200).send(results.map(postulacion => ({
                 ...postulacion,
-                cartaPresentacion: Buffer.from(postulacion.cartaPresentacion).toString('base64') // Convierte a base64
+                cartaPresentacion: postulacion.cartaPresentacion ? Buffer.from(postulacion.cartaPresentacion).toString('base64') : null // Convierte a base64 si existe
             })));
         } else {
             res.status(404).send({ message: 'No hay postulaciones' });
@@ -181,6 +181,7 @@ app.get('/aplicaciones/:vacanteID', async (req, res) => {
         res.status(500).send({ message: 'Error en el servidor', error: err });
     }
 });
+
 
 // Ruta para obtener una carta de presentación por ID de postulación
 app.get('/postulacionalumno/:id', async (req, res) => {
@@ -233,7 +234,7 @@ app.get('/postulaciones/:alumnoID', async (req, res) => {
 // Ruta para obtener un asesor interno por ID
 app.get('/asesorInterno/:id', async (req, res) => {
     const asesorInternoID = req.params.id;
-    const query = 'SELECT * FROM asesorinterno WHERE asesorInternoID = ?';
+    const query = 'SELECT * FROM asesorInterno WHERE asesorInternoID = ?';
 
     try {
         console.log('Ejecutando consulta para obtener asesor interno con ID:', asesorInternoID);
