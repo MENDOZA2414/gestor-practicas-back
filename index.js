@@ -8,31 +8,15 @@ const pool = require('./db');
 const app = express();
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
-});
 
-
-const cors = require('cors');
-
-app.use(cors({
-  origin: '*', // ⚠️ Permite cualquier origen (para desarrollo)
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Manejar preflight requests (solicitudes OPTIONS)
-app.options('*', (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  res.sendStatus(200);
-});
-
-  
+app.use(cors());
 app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
+
+app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}`);
+});
 
 app.get('/', (req, res) => {
     res.send('Servidor funcionando');
