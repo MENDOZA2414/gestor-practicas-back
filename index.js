@@ -88,6 +88,17 @@ app.use((err, req, res, next) => {
 
     next(err);
 });
+app.get('/test-db', async (req, res) => {
+    try {
+        const [result] = await pool.query('SELECT 1');
+        console.log('Conexión a la base de datos exitosa:', result);
+        return res.status(200).send({ message: 'Conexión exitosa' });
+    } catch (err) {
+        console.error('Error de conexión a la base de datos:', err);
+        return res.status(500).send({ message: 'Error en la conexión', error: err.message });
+    }
+});
+
 
 // ------------------------------ METODOS GET ------------------------------------------
 // Ruta para verificar cambios en la tabla 'documentoAlumno' en los últimos 10 segundos
