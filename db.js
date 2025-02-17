@@ -2,7 +2,7 @@ const mysql = require('mysql2');
 
 const MYSQLHOST = process.env.MYSQLHOST || 'localhost';
 const MYSQLUSER = process.env.MYSQLUSER || 'root';
-const MYSQLPASSWORD = process.env.MYSQLPASSWORD || 'Jm241410';
+const MYSQLPASSWORD = process.env.MYSQLPASSWORD || 'Jm24141002';
 const MYSQLDATABASE = process.env.MYSQLDATABASE || 'sistemaPracticas';
 const MYSQLPORT = process.env.MYSQLPORT || 3306;
 
